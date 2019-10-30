@@ -23,6 +23,7 @@ module.exports = {
   ** Global CSS
   */
   css: [
+    '@assets/reset.css',
     'element-ui/lib/theme-chalk/index.css'
   ],
   /*
