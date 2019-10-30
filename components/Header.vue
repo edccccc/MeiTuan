@@ -5,7 +5,7 @@
         <div class="header-geo">
           <div class="header-location">
             <div class="current-city">
-              <i class="el-icon-location"></i>厦门
+              <i class="el-icon-location"></i>{{city}}
             </div>
             <a class="change-city">更换城市</a>
             <div class="near-city">
@@ -18,25 +18,28 @@
           </div>
         </div>
         <div class="user_action">
-          <el-link type="warning" href='/logIn'>立即登录</el-link>
-          <el-link type="info" href='/signIn'>注册</el-link>
+          <el-link type="warning" href="/logIn">立即登录</el-link>
+          <el-link type="info" href="/signIn">注册</el-link>
         </div>
       </div>
       <div class="header-item">
-          <nav-bar></nav-bar>
+        <nav-bar></nav-bar>
       </div>
     </div>
   </div>
 </template>
 <script>
-import navBar from './navBar'
+import navBar from "./navBar";
+import { mapGetters } from "vuex";
 export default {
   data() {
-    return {
-    };
+    return {};
   },
-  components:{
-      navBar
+  components: {
+    navBar
+  },
+  computed:{
+    ...mapGetters({city:'geo/city'})
   }
 };
 </script>
