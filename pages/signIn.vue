@@ -32,9 +32,25 @@
           <el-form-item>
             <el-button type="primary" @click="onSubmit" class="submit-btn">同意以下协议并注册</el-button>
           </el-form-item>
+          <el-form-item>
+            <a class="f1" href="http://www.meituan.com/about/terms" target="_blank">《美团网用户协议》</a>
+            <a
+              class="f1"
+              href="https://rules-center.meituan.com/rules-detail/2"
+              target="_blank"
+            >《美团网隐私协议》</a>
+          </el-form-item>
         </el-form>
       </div>
     </div>
+    <footer class="footer">
+      <p class="copyright">
+        ©
+        <a class="f1" href="/">meituan.com</a>&nbsp;
+        <a class="f1" target="_blank" href="http://www.miibeian.gov.cn/">京ICP证070791号</a>&nbsp;
+        <span class="f1">京公网安备11010502025545号</span>
+      </p>
+    </footer>
   </div>
 </template>
 <script>
@@ -118,6 +134,23 @@ export default {
     .form {
       width: 400px;
       margin-top: 30px;
+      .f1 {
+        color: #fe8c00;
+        text-decoration: none;
+      }
+    }
+  }
+  .footer {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+    text-align: center;
+    .copyright {
+      font-size: 12px;
+      .f1 {
+        color: #999;
+        font-size: 13px;
+        text-decoration: none;
+      }
     }
   }
 }
@@ -129,6 +162,10 @@ export default {
   }
   .el-form-item {
     margin-bottom: 15px;
+    .el-input__inner:focus {
+      border-color: #fe8c00;
+      outline: 0;
+    }
     .el-button {
       margin-top: 10px;
       padding: 7px 15px;
