@@ -16,15 +16,18 @@
     <div class="form-con">
       <div class="form">
         <el-form ref="form" :model="form" label-width="90px">
+          <el-form-item label="用户名">
+            <el-input v-model="form.username"></el-input>
+          </el-form-item>
           <el-form-item label="邮箱">
-            <el-input v-model="form.mail"></el-input>
+            <el-input v-model="form.email"></el-input>
           </el-form-item>
           <el-form-item label="邮箱动态码">
             <el-input v-model="form.code"></el-input>
-            <el-button round>验证码</el-button>
+            <el-button round @click="getCode">验证码</el-button>
           </el-form-item>
           <el-form-item label="创建密码">
-            <el-input v-model="form.pwd"></el-input>
+            <el-input v-model="form.password"></el-input>
           </el-form-item>
           <el-form-item label="确认密码">
             <el-input v-model="form.confirmPwd"></el-input>
@@ -59,16 +62,22 @@ export default {
   data() {
     return {
       form: {
-        mail: "",
+        email: "825231573@qq.com",
         code: "",
-        pwd: "",
+        password: "",
         confirmPwd: ""
       }
     };
   },
   methods: {
-    onSubmit() {
-      console.log("submit!");
+    async onSubmit() {
+        const data =await this.$axios.post('/user/signIn',this.form)
+        console.log(data)
+    },
+    async getCode(){
+        console.log(this.form)
+        const data =await this.$axios.post('/user/verify',this.form)
+        console.log(data)
     }
   }
 };

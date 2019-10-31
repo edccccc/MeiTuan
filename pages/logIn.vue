@@ -11,7 +11,8 @@
       </div>
       <div class="right">
         <el-input placeholder="手机号/邮箱" prefix-icon="el-icon-user" v-model="form.username"></el-input>
-        <el-input placeholder="密码" prefix-icon="el-icon-lock" v-model="form.pwd"></el-input>
+        <el-input placeholder="密码" prefix-icon="el-icon-lock" v-model="form.password"></el-input>
+        <el-button type="primary" @click="onSubmit" class="submit-btn">登录</el-button>
       </div>
     </div>
   </div>
@@ -23,9 +24,14 @@ export default {
     return {
       form: {
         username: "",
-        pwd: ""
+        password: ""
       }
     };
+  },
+  methods:{
+      async onSubmit(){
+          const data = await this.$axios.post('/user/login',this.form)
+      }
   }
 };
 </script>

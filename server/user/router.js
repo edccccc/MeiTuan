@@ -10,12 +10,6 @@ const Store = new Redis().client
 const router = new Router({
   prefix: '/user'
 });
-router.get('/test', (ctx, next) => {
-  ctx.body = {
-    code: 0,
-    mes: 'test'
-  }
-});
 router.post('/signIn', async (ctx, next) => {
   const {
     username,
@@ -26,16 +20,14 @@ router.post('/signIn', async (ctx, next) => {
 
   if (code) {
     const saveCode = await Store.hget(`mail:${username}`, 'code')
-    const saveExpire = await Store.hget(`mail:${username}`, 'expire')
-    if (code === saveCode) {
-      if (new Date().getTime() - saveExpire > 0) {
-        ctx.body = {
-          code: 409,
-          err: '验证码已过期！'
-        }
-        return false
+    // const saveExpire = await Store.hget(`mail:${username}`, 'expire')
+    if (!saveCode) {
+      ctx.body = {
+        code: 409,
+        err: '验证码已过期！'
       }
-    } else {
+      return false
+    } else if (saveCode !== code) {
       ctx.body = {
         code: 409,
         err: '验证码不正确！'
@@ -67,6 +59,7 @@ router.post('/signIn', async (ctx, next) => {
     const {
       data
     } = await $axios.post('/user/login')
+    console.log(data)
     if (data && data.code === 200) {
       ctx.body = {
         code: 200,
@@ -114,8 +107,8 @@ router.post('/login', async (ctx, next) => {
 
 router.post('/verify', async (ctx, next) => {
   const username = ctx.request.body.username
-  const saveExpire = await Store.hget(`mail:${username}`, 'expire')
-  if (saveExpire && new Date().getTime() - saveExpire > 0) {
+  const saveExpire = await Store.hget(`mail:${username}`, 'email')
+  if (saveExpire) {
     ctx.body = {
       code: 409,
       err: '操作过于频繁，请稍后重试！'
@@ -134,33 +127,34 @@ router.post('/verify', async (ctx, next) => {
       code: Email.smtp.code,
       expire: Email.smtp.expire,
       email: ctx.request.body.email,
-      user: ctx.request.body.username
+      username
     }
     const mailText = {
-      from: `<认证邮件>${Email.smtp.user}美团系统`,
+      from: `美团系统认证邮件<${Email.smtp.user}>`,
       to: ko.email,
       subject: '<美团网站注册验证码>',
       html: `您的注册码是${ko.code}`
     }
-    await transporter.sendMail(mailText, (err, info) => {
+    const info = await transporter.sendMail(mailText, (err) => {
       if (err) {
         ctx.body = {
-          code: 409,
+          code: -1,
           err
         }
-        return console.log(err)
-      } else {
-        Store.hmset(`mail:${username}`, 'code', ko.code, 'expire', ko.expire, 'email', ko.mail)
-        ctx.body = {
-          code: 200,
-          msg: '验证码已发出，有效期为一分钟！'
-        }
+        return
       }
     })
+    Store.hmset(`mail:${username}`, 'code', ko.code, 'expire', ko.expire(), 'email', ko.email)
+    //设置redis缓存的过期时间
+    Store.expire(`mail:${username}`, 60)
+    ctx.body = {
+      code: 200,
+      msg: '验证码已发送，有效期为一分钟！'
+    }
   }
 })
 
-router.get('logout', async (ctx) => {
+router.get('/logout', async (ctx) => {
   await ctx.logout()
   if (!ctx.isAuthenticated()) {
     ctx.body = {
@@ -175,7 +169,7 @@ router.get('logout', async (ctx) => {
   }
 })
 
-router.get('getUserInfo', (ctx) => {
+router.get('/getUserInfo', (ctx) => {
   if (ctx.isAuthenticated()) {
     const {
       username,
